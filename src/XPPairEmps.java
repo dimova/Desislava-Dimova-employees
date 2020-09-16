@@ -10,9 +10,10 @@ import java.util.*;
 
 public class XPPairEmps {
     private static URL resource = XPPairEmps.class.getClassLoader().getResource("employees.txt");
-    private static Map<Integer, Employee> employees = new HashMap<Integer,Employee>();
+    private static Map<Integer, Employee> employees = new HashMap<>();
     private static List<Employee> emps = new ArrayList<>();
     private static Project projectNum = new Project();
+    private static HashMap<Integer, Project> hashMapProjects = new HashMap<>();
 
 
     public static File getResource(URL resource) {
@@ -44,35 +45,25 @@ public class XPPairEmps {
         }
 
     }
-    private static void readToProjects(File file) {
+
+    private static ArrayList<Project> readToProjects(File file) {
         BufferedReader reader = null;
         Employee employee = new Employee();
         Project projectStructure = new Project();
         Date dateFrom;
         Date dateTo;
+        int counter=0;
+        //List<Project> listOfProjects = new LinkedList<Project>();
+        //Map<Integer,Project> mapOfProjects = new TreeMap<Integer,Project>();
+        ArrayList<Project> arrayListProject = new ArrayList<Project>();
         try {
-            try {
-                reader = new BufferedReader(new FileReader(file));
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
+
+            reader = new BufferedReader(new FileReader(file));
+            reader.readLine();
             String line = new String();
             while (true) {
-                try {
-                    if (!((line = reader.readLine()) != null)) break;
-                } catch (IOException ioException) {
-                    ioException.printStackTrace();
-                }
-                while (true) {
-                    try {
-                        if (!((line = reader.readLine()) != null)) break;
-                    } catch (IOException ioException) {
-                        ioException.printStackTrace();
-                    }
-                }
-                //your code
-                System.out.println(line);
-                // read next line
+
+                if ((line = reader.readLine()) == null) break;
 
                 String[] res = line.split("[,]", 0);
                 for (int i = 0; i < res.length; i++) {
@@ -84,7 +75,7 @@ public class XPPairEmps {
                 try {
                     if (res[2].equalsIgnoreCase("NULL")) {
                         long millis = System.currentTimeMillis();
-                        java.util.Date date = new java.util.Date(millis);
+                        Date date = new Date(millis);
                         dateFrom = date;
                     } else {
                         dateFrom = new SimpleDateFormat("yyyy-MM-dd").parse(res[2]);
@@ -97,7 +88,7 @@ public class XPPairEmps {
                 try {
                     if (res[3].equalsIgnoreCase("NULL")) {
                         long millis = System.currentTimeMillis();
-                        java.util.Date date = new java.util.Date(millis);
+                        Date date = new Date(millis);
                         dateTo = date;
                     } else {
                         dateTo = new SimpleDateFormat("yyyy-MM-dd").parse(res[3]);
@@ -106,22 +97,19 @@ public class XPPairEmps {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                //employees.put(employee.getEmpID(), employee);
-                //emps.add(employee);
 
-                System.out.println("Employee ID: " + projectNum.getEmpID());
-                System.out.println("Project ID: " + projectNum.getProjectId());
-                System.out.println("Date From: " + projectNum.getDateFrom());
-                System.out.println("Date To: " + projectNum.getDateTo());
+                System.out.println(projectNum.toString());
+                arrayListProject.add(projectNum);
 
 
 
             }
-        } catch (Exception e) {
+
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
-
+        return arrayListProject;
     }
 
     private static void readToEmployees(File file) {
@@ -129,7 +117,7 @@ public class XPPairEmps {
         Employee employee = new Employee();
         Date dateFrom;
         Date dateTo;
-        LinkedHashSet<Employee> setOfEmployees=new LinkedHashSet<Employee>();
+        LinkedHashSet<Employee> setOfEmployees = new LinkedHashSet<>();
 
 
         try {
@@ -137,20 +125,21 @@ public class XPPairEmps {
             String line = new String();
             while (true) {
                 try {
-                    if (!((line = reader.readLine()) != null)) break;
+                    if ((line = reader.readLine()) == null) break;
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }
                 while (true) {
                     try {
-                        if (!((line = reader.readLine()) != null)) break;
+                        if ((line = reader.readLine()) == null) break;
                     } catch (IOException ioException) {
                         ioException.printStackTrace();
                     }
                     //your code
-                    System.out.println(line);
-                    // read next line
+                    //System.out.println(line);
+                    //read next line
 
+                    assert line != null;
                     String[] res = line.split("[,]", 0);
                     for (int i = 0; i < res.length; i++) {
                         res[i] = res[i].trim();
@@ -160,7 +149,7 @@ public class XPPairEmps {
                     try {
                         if (res[2].equalsIgnoreCase("NULL")) {
                             long millis = System.currentTimeMillis();
-                            java.util.Date date = new java.util.Date(millis);
+                            Date date = new Date(millis);
                             dateFrom = date;
                         } else {
                             dateFrom = new SimpleDateFormat("yyyy-MM-dd").parse(res[2]);
@@ -173,7 +162,7 @@ public class XPPairEmps {
                     try {
                         if (res[3].equalsIgnoreCase("NULL")) {
                             long millis = System.currentTimeMillis();
-                            java.util.Date date = new java.util.Date(millis);
+                            Date date = new Date(millis);
                             dateTo = date;
                         } else {
                             dateTo = new SimpleDateFormat("yyyy-MM-dd").parse(res[3]);
@@ -197,15 +186,13 @@ public class XPPairEmps {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Iterator<Employee> itr = setOfEmployees.iterator();
-        while (itr.hasNext()) {
-            Employee e = itr.next();
+        for (Employee e : setOfEmployees) {
             System.out.println(e.getProjectID());
             System.out.println(e.getEmpID());
         }
     }
 
-    private static void overlapRange(){
+    private static void overlapRange() {
         //To find the actual overlap range, you take the maximum of the two low ends, and the minimum of the two high ends:
         //int e = Math.max(a,b);
         //int f = Math.min(c,d);
@@ -217,8 +204,13 @@ public class XPPairEmps {
     public static void main(String[] args) {
         // get the file url, not working in JAR file.
         File testFile = getResource(resource);
-        printFile(testFile);
-        readToEmployees(testFile);
+        //printFile(testFile);
+        //readToEmployees(testFile);
+        ArrayList<Project> projects = readToProjects(testFile);
+
+
+
+
 
     }
 }

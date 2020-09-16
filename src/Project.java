@@ -1,12 +1,13 @@
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
+import java.util.Map;
+import java.util.Objects;
 
 public class Project {
     private int empID;
     private int projectId;
     private Date dateFrom;
     private Date dateTo;
+    private Map<Integer,Employee> employeeMap;
 
     public int getEmpID() {
         return empID;
@@ -40,4 +41,29 @@ public class Project {
         this.projectId = projectId;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Project project = (Project) o;
+        return empID == project.empID &&
+                projectId == project.projectId &&
+                dateFrom.equals(project.dateFrom) &&
+                dateTo.equals(project.dateTo);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(empID, projectId, dateFrom, dateTo);
+    }
+
+    @Override
+    public String toString() {
+        return "Project{" +
+                "empID=" + empID +
+                ", projectId=" + projectId +
+                ", dateFrom=" + dateFrom +
+                ", dateTo=" + dateTo +
+                '}';
+    }
 }
