@@ -1,5 +1,6 @@
 import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
 
 public class Employee {
     private int empID;
@@ -62,6 +63,24 @@ public class Employee {
 
         return 0;
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Employee)) return false;
+        Employee employee = (Employee) o;
+        return getEmpID() == employee.getEmpID() &&
+                getProjectID() == employee.getProjectID() &&
+                getWorkTime() == employee.getWorkTime() &&
+                getDateFrom().equals(employee.getDateFrom()) &&
+                getDateTo().equals(employee.getDateTo()) &&
+                Objects.equals(employees, employee.employees);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getEmpID(), getProjectID(), getDateFrom(), getDateTo(), employees, getWorkTime());
     }
 
 
