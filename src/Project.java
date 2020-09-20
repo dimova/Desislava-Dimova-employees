@@ -7,7 +7,7 @@ public class Project {
     private int projectId;
     private Date dateFrom;
     private Date dateTo;
-    private Map<Integer,Employee> employeeMap;
+
 
     public int getEmpID() {
         return empID;
@@ -40,6 +40,8 @@ public class Project {
     public void setProjectId(int projectId) {
         this.projectId = projectId;
     }
+
+
 
     @Override
     public boolean equals(Object o) {

@@ -9,12 +9,7 @@ import java.util.*;
 
 
 public class XPPairEmps {
-    private static URL resource = XPPairEmps.class.getClassLoader().getResource("employees.txt");
-    private static Map<Integer, Employee> employees = new HashMap<>();
-    private static List<Employee> emps = new ArrayList<>();
-    private static Project projectNum = new Project();
-    private static HashMap<Integer, Project> hashMapProjects = new HashMap<>();
-
+    private static final URL resource = XPPairEmps.class.getClassLoader().getResource("employees.txt");
 
     public static File getResource(URL resource) {
         File resourceFile = null;
@@ -46,74 +41,74 @@ public class XPPairEmps {
 
     }
 
-    private static ArrayList<Project> readToProjects(File file) {
+    private static void readToProjects(File file) {
+        ArrayList<Project> arrayListProjects = new ArrayList<>();
         BufferedReader reader = null;
-        Employee employee = new Employee();
-        Project projectStructure = new Project();
+        try {
+            reader = new BufferedReader(new FileReader(file));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         Date dateFrom;
         Date dateTo;
-        int counter=0;
-        //List<Project> listOfProjects = new LinkedList<Project>();
-        //Map<Integer,Project> mapOfProjects = new TreeMap<Integer,Project>();
-        ArrayList<Project> arrayListProject = new ArrayList<Project>();
+
+        Map<Integer, List<Project>> byProID
+                = new HashMap<>();
+
+
         try {
 
-            reader = new BufferedReader(new FileReader(file));
+            assert reader != null;
             reader.readLine();
-            String line = new String();
             while (true) {
 
+                String line;
                 if ((line = reader.readLine()) == null) break;
 
                 String[] res = line.split("[,]", 0);
                 for (int i = 0; i < res.length; i++) {
                     res[i] = res[i].trim();
                 }
-
+                Project projectNum = new Project();
                 projectNum.setEmpID(Integer.parseInt(res[0]));
                 projectNum.setProjectId(Integer.parseInt(res[1]));
-                try {
-                    if (res[2].equalsIgnoreCase("NULL")) {
-                        long millis = System.currentTimeMillis();
-                        Date date = new Date(millis);
-                        dateFrom = date;
-                    } else {
-                        dateFrom = new SimpleDateFormat("yyyy-MM-dd").parse(res[2]);
-                    }
-                    projectNum.setDateFrom(dateFrom);
-                } catch (ParseException e) {
-                    e.printStackTrace();
+
+                if (res[2].equalsIgnoreCase("NULL")) {
+                    long millis = System.currentTimeMillis();
+                    dateFrom = new Date(millis);
+                } else {
+                    dateFrom = new SimpleDateFormat("yyyy-MM-dd").parse(res[2]);
                 }
+                projectNum.setDateFrom(dateFrom);
 
-                try {
-                    if (res[3].equalsIgnoreCase("NULL")) {
-                        long millis = System.currentTimeMillis();
-                        Date date = new Date(millis);
-                        dateTo = date;
-                    } else {
-                        dateTo = new SimpleDateFormat("yyyy-MM-dd").parse(res[3]);
-                    }
-                    projectNum.setDateTo(dateTo);
-                } catch (ParseException e) {
-                    e.printStackTrace();
+                if (res[3].equalsIgnoreCase("NULL")) {
+                    long millis = System.currentTimeMillis();
+                    dateTo = new Date(millis);
+                } else {
+                    dateTo = new SimpleDateFormat("yyyy-MM-dd").parse(res[3]);
                 }
-
-                System.out.println(projectNum.toString());
-                arrayListProject.add(projectNum);
-
-
-
+                projectNum.setDateTo(dateTo);
+                arrayListProjects.add(projectNum);
             }
 
-        } catch (IOException e) {
+
+        } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
+        for (Project arrayListProject : arrayListProjects) {
+            byProID.computeIfAbsent(arrayListProject.getProjectId(), k -> new ArrayList<>()).add(arrayListProject);
+        }
 
-        return arrayListProject;
+        for (Map.Entry<Integer, List<Project>> entry : byProID.entrySet()) {
+            System.out.println("Key = " + entry.getKey() +
+                    ", Value = " + entry.getValue());
+        }
+
+
     }
 
     private static void readToEmployees(File file) {
-        BufferedReader reader = null;
+        BufferedReader reader;
         Employee employee = new Employee();
         Date dateFrom;
         Date dateTo;
@@ -122,8 +117,8 @@ public class XPPairEmps {
 
         try {
             reader = new BufferedReader(new FileReader(file));
-            String line = new String();
             while (true) {
+                String line = "";
                 try {
                     if ((line = reader.readLine()) == null) break;
                 } catch (IOException ioException) {
@@ -135,11 +130,7 @@ public class XPPairEmps {
                     } catch (IOException ioException) {
                         ioException.printStackTrace();
                     }
-                    //your code
-                    //System.out.println(line);
-                    //read next line
 
-                    assert line != null;
                     String[] res = line.split("[,]", 0);
                     for (int i = 0; i < res.length; i++) {
                         res[i] = res[i].trim();
@@ -149,8 +140,7 @@ public class XPPairEmps {
                     try {
                         if (res[2].equalsIgnoreCase("NULL")) {
                             long millis = System.currentTimeMillis();
-                            Date date = new Date(millis);
-                            dateFrom = date;
+                            dateFrom = new Date(millis);
                         } else {
                             dateFrom = new SimpleDateFormat("yyyy-MM-dd").parse(res[2]);
                         }
@@ -162,8 +152,7 @@ public class XPPairEmps {
                     try {
                         if (res[3].equalsIgnoreCase("NULL")) {
                             long millis = System.currentTimeMillis();
-                            Date date = new Date(millis);
-                            dateTo = date;
+                            dateTo = new Date(millis);
                         } else {
                             dateTo = new SimpleDateFormat("yyyy-MM-dd").parse(res[3]);
                         }
@@ -171,14 +160,11 @@ public class XPPairEmps {
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
-                    //employees.put(employee.getEmpID(), employee);
-                    //emps.add(employee);
                     setOfEmployees.add(employee);
                     System.out.println("Employee ID: " + employee.getEmpID());
                     System.out.println("Project ID: " + employee.getProjectID());
                     System.out.println("Date From: " + employee.getDateFrom());
                     System.out.println("Date To: " + employee.getDateTo());
-
 
                 }
             }
@@ -186,19 +172,33 @@ public class XPPairEmps {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        for (Employee e : setOfEmployees) {
-            System.out.println(e.getProjectID());
-            System.out.println(e.getEmpID());
+    }
+    public static boolean OverlappingPeriods(Date aStart, Date aEnd,
+                                          Date bStart, Date bEnd)
+    {
+        if (aStart.after(aEnd)) {
+            throw new IllegalArgumentException("A start can not be after its end.");
         }
+        if(bStart.after(bEnd)) {
+            throw new IllegalArgumentException("B start can not be after its end.");
+        }
+        return !((aEnd.before(bStart) && aStart.before(bStart)) ||
+                (bEnd.before(aStart) && bStart.before(aStart)));
     }
 
-    private static void overlapRange() {
+    public static boolean overlapRange(Date aStart, Date aEnd,
+                                       Date bStart, Date bEnd) {
         //To find the actual overlap range, you take the maximum of the two low ends, and the minimum of the two high ends:
-        //int e = Math.max(a,b);
-        //int f = Math.min(c,d);
+        //int e = Math.max(aStart,bStart);
+        int e;
+        if(aStart.before(bStart)){ e = (int) bStart.getTime();} else { e = (int) aStart.getTime();}
+        //int f = Math.min(aEnd,bEnd);
+        int f;
+        if(aEnd.before(bEnd)){ f = (int) aEnd.getTime();} else { f = (int) bEnd.getTime();}
         // overlapping range is [e,f], and overlap exists if e <= f.
-        //All above assumes that the ranges are inclusive, that is, the range defined by a and c includes both the value of a and the value of c.
+        //All above assumes that the ranges are inclusive, that is, the range defined by aStart and aEnd includes both the value of aStart and the value of aEnd.
         // It is fairly trivial to adjust for exclusive ranges, however.
+        return e<=f;
     }
 
     public static void main(String[] args) {
@@ -206,10 +206,7 @@ public class XPPairEmps {
         File testFile = getResource(resource);
         //printFile(testFile);
         //readToEmployees(testFile);
-        ArrayList<Project> projects = readToProjects(testFile);
-
-
-
+        readToProjects(testFile);
 
 
     }
