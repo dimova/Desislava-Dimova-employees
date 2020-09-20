@@ -6,11 +6,9 @@ import java.nio.file.Files;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.Date;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 
 public class XPPairEmps {
@@ -131,10 +129,11 @@ public class XPPairEmps {
                         xpp.setEmployeeB(e2);
                         xpp.setEmpAId(Integer.toString(e1.getEmpID()));
                         xpp.setEmpBId(Integer.toString(e2.getEmpID()));
-                        if(e1.getProjectID()==e2.getProjectID()){
+                        if (e1.getProjectID() == e2.getProjectID()) {
                             xpp.setProjectId(Integer.toString(a.getProjectId()));
                         }
-
+                        xpp.setTotalDaysWorkedTogether(overlapCalculated(e1.getDateFrom(), e1.getDateTo(),
+                                e2.getDateFrom(), e2.getDateTo()));
                         xpPairs.add(xpp);
 
                     }
@@ -224,7 +223,7 @@ public class XPPairEmps {
     }
 
 
-    public static void numberOfDays(Date d1, Date d2) {
+    public static String numberOfDays(Date d1, Date d2) {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String strD1 = dateFormat.format(d1);
         String strD2 = dateFormat.format(d2);
@@ -233,12 +232,40 @@ public class XPPairEmps {
         LocalDate dateAfter = LocalDate.parse(strD2);
 
         //calculating number of days in between
-        long noOfDaysBetween = ChronoUnit.DAYS.between(dateBefore, dateAfter);
+        long numOfDaysBetween = ChronoUnit.DAYS.between(dateBefore, dateAfter);
 
         //displaying the number of days
-        System.out.println(noOfDaysBetween);
+        System.out.println(numOfDaysBetween);
+        return Long.toString(numOfDaysBetween);
 
     }
+
+    protected static String overlapCalculated(Date aStart, Date aEnd,
+                                              Date bStart, Date bEnd) {
+        //To find the actual overlap range, you take the maximum of the two low ends, and the minimum of the two high ends:
+        //int e = Math.max(aStart,bStart);
+        Date e;
+        if (aStart.before(bStart)) {
+            e = bStart;
+        } else {
+            e = aStart;
+        }
+        //int f = Math.min(aEnd,bEnd);
+        Date f;
+        if (aEnd.before(bEnd)) {
+            f = aEnd;
+        } else {
+            f = bEnd;
+        }
+        // overlapping range is [e,f], and overlap exists if e <= f.
+        //All above assumes that the ranges are inclusive, that is, the range defined by aStart and aEnd includes both the value of aStart and the value of aEnd.
+        // It is fairly trivial to adjust for exclusive ranges, however.
+        //return e <= f;
+        String daysOfWorkTogether;
+        daysOfWorkTogether = numberOfDays(e, f);
+        return daysOfWorkTogether;
+    }
+
 
     public static boolean overlappingPeriods(Date aStart, Date aEnd,
                                              Date bStart, Date bEnd) {
@@ -278,8 +305,8 @@ public class XPPairEmps {
     public static void main(String[] args) throws ParseException {
         // get the file url, not working in JAR file.
         File testFile = getResource(resource);
-        printFile(testFile);
-        readToEmployees(testFile);
+        //printFile(testFile);
+        //readToEmployees(testFile);
         readToProjects(testFile);
 
     }
