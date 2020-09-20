@@ -305,7 +305,7 @@ public class XPPairEmps {
     public static void main(String[] args) throws ParseException {
         // get the file url, not working in JAR file.
         File testFile = getResource(resource);
-        //printFile(testFile);
+        printFile(testFile);
         //readToEmployees(testFile);
         readToProjects(testFile);
 
