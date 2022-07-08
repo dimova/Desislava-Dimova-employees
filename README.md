@@ -1,5 +1,9 @@
 # Desislava-Dimova-employees
 Sirma Task
+
+Run src/app/TeamLongestPeriodMain.java to produce the desired output in the console, the project that is the longest running, and in a file called test.
+Run src/gui/SwingTableExample.java to display the projects in a Swing table.
+
 Create an application that identifies the pair of employees who have worked
 together on common projects for the longest period of time.
 Input data:
